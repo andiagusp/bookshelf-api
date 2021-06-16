@@ -13,15 +13,14 @@ class NotesService {
     const id = nanoid(16);
     const createdAt = new Date().toISOString();
     const updatedAt = new Date().toISOString();
-  
+
     const query = {
       text: 'INSERT INTO notes VALUES($1, $2, $3, $4, $5, $6) RETURNING id',
       values: [id, title, body, tags, createdAt, updatedAt],
     };
-    
+
     const result = await this._pool.query(query);
     if (!result.rows[0].id) {
-      console.log( result.row );
       throw new InvariantError('Catatan gagal ditambahkan');
     }
 

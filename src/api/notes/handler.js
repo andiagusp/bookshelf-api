@@ -1,4 +1,4 @@
-const ClientError = require("../../exceptions/ClientError");
+const ClientError = require('../../exceptions/ClientError');
 
 class NotesHandler {
   constructor(service, validator) {
@@ -15,8 +15,8 @@ class NotesHandler {
     try {
       this._validator.validateNotePayload(request.payload);
       const { title = 'untitled', body, tags } = request.payload;
-      const noteId = await this._service.addNote({ title, body, tags });   
-      
+      const noteId = await this._service.addNote({ title, body, tags });
+
       const response = h.response({
         status: 'success',
         message: 'Catatan berhasil ditambahkan',
@@ -27,7 +27,7 @@ class NotesHandler {
       response.code(201);
       return response;
     } catch (error) {
-      if (error instanceof ClientError){
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
           message: error.message,
@@ -60,7 +60,7 @@ class NotesHandler {
     try {
       const { id } = request.params;
       const note = await this._service.getNoteById(id);
-      
+
       return {
         status: 'success',
         data: {
@@ -68,7 +68,7 @@ class NotesHandler {
         },
       };
     } catch (error) {
-      if (error instanceof ClientError){
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
           message: error.message,
@@ -91,14 +91,14 @@ class NotesHandler {
     try {
       const { id } = request.params;
       const data = request.payload;
-      const note = await this._service.editNoteById(id, data);
-      
+      await this._service.editNoteById(id, data);
+
       return {
         status: 'success',
         message: 'Catatan berhasil diperbarui',
       };
     } catch (error) {
-      if (error instanceof ClientError){
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
           message: error.message,
@@ -121,13 +121,13 @@ class NotesHandler {
     try {
       const { id } = request.params;
       await this._service.deleteNoteById(id);
-      
+
       return {
         status: 'success',
         message: 'Catatan berhasil dihapus',
       };
     } catch (error) {
-      if (error instanceof ClientError){
+      if (error instanceof ClientError) {
         const response = h.response({
           status: 'fail',
           message: error.message,
