@@ -1,3 +1,4 @@
+// contoh plugin dalam hapi
 const notesPlugin = {
   register: async (server, options) => {
     const name = 'notes';
