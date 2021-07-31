@@ -10,16 +10,21 @@ const users = require('./api/users');
 const UsersValidator = require('./validator/users');
 const UsersService = require('./services/postgres/UsersService');
 
+const collaborations = require('./api/collaborations');
+const CollaborationsValidator = require('./validator/collaborations');
+const CollaborationsService = require('./services/postgres/CollaborationsService');
+
 const TokenManager = require('./tokenize/TokenManager');
 const authentications = require('./api/authentications');
 const AuthenticationsValidator = require('./validator/authentications')
 const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 
 const init = async () => {
-  const notesService = new NotesService();
+  const collaborationsService = new CollaborationsService();
+  const notesService = new NotesService(collaborationsService);
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
-
+  
   const server = Hapi.server({
     port: process.env.PORT,
     host: process.env.HOST,
@@ -32,7 +37,7 @@ const init = async () => {
 
   /* plugin external */
   await server.register([
-    { plugin: Jwt, },
+    { plugin: Jwt, }
   ]);
 
   server.auth.strategy('notesapp_jwt', 'jwt', {
@@ -43,10 +48,10 @@ const init = async () => {
       sub: false,
       maxAgeSec: process.env.ACCESS_TOKEN_AGE,
     },
-    validate: (artifact) => ({
+    validate: (artifacts) => ({
       isValid: true,
       credentials: {
-        id: artifact.decoded.payload.id
+        id: artifacts.decoded.payload.id
       },
     }),
   });
@@ -76,9 +81,21 @@ const init = async () => {
         validator: AuthenticationsValidator,
       },
     },
+    {
+      plugin: collaborations,
+      options: {
+        collaborationsService,
+        notesService,
+        validator: CollaborationsValidator,
+      }
+    }
   ]);
 
-  await server.start();
+  try {
+    await server.start();
+  } catch(error) {
+    console.log(error);
+  }
   console.log(`Server running on ${server.info.uri}`);
 };
 
