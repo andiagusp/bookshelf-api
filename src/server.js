@@ -19,6 +19,11 @@ const authentications = require('./api/authentications');
 const AuthenticationsValidator = require('./validator/authentications')
 const AuthenticationsService = require('./services/postgres/AuthenticationsService');
 
+const _exports = require('./api/exports');
+const ExportsValidator = require('./validator/exports');
+const ProducerService = require('./services/rabbitmq/ProducerService');
+
+
 const init = async () => {
   const collaborationsService = new CollaborationsService();
   const notesService = new NotesService(collaborationsService);
@@ -87,6 +92,13 @@ const init = async () => {
         collaborationsService,
         notesService,
         validator: CollaborationsValidator,
+      }
+    },
+    {
+      plugin: _exports,
+      options: {
+        service: ProducerService,
+        validator: ExportsValidator
       }
     }
   ]);
